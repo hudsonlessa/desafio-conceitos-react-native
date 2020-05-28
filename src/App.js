@@ -18,7 +18,6 @@ export default function App() {
   useEffect(() => {
     api.get('/repositories').then(response => {
       setRepositories(response.data);
-      console.log(repositories);
     });
   }, []);
 
@@ -26,11 +25,17 @@ export default function App() {
     const response = await api.post(`repositories/${id}/like`);
 
     if (response.status === 200) {
-      repositoryIndex = repositories.findIndex(repository => repository.id === id);
+      const likedRepository = response.data;
 
-      repositories[repositoryIndex].likes ++;
+      const updatedRepositories = repositories.map(repository => {
+        if (repository.id === id) {
+          return likedRepository;
+        } else {
+          return repository;
+        }
+      });
 
-      setRepositories([...repositories]);
+      setRepositories(updatedRepositories);
     }
   }
 
@@ -59,7 +64,7 @@ export default function App() {
                   style={styles.likeText}
                   testID={`repository-likes-${repository.id}`}
                 >
-                  {repository.likes} curtidas
+                  {repository.likes} curtida{repository.likes > 1 ? "s" : ""}
                 </Text>
               </View>
 
